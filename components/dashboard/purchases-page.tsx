@@ -46,6 +46,7 @@ export default function PurchasesPage({
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
         apikey: supabaseKey,
+        Prefer: "return=representation",
       },
       body: data ? JSON.stringify(data) : undefined,
     })
