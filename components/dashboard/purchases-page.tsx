@@ -146,7 +146,7 @@ export default function PurchasesPage({
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-1">Cost (Rp) *</label>
+                  <label className="block text-sm font-medium text-foreground mb-1">Cost ($) *</label>
                   <Input
                     type="number"
                     step="0.01"
@@ -215,7 +215,7 @@ export default function PurchasesPage({
                         </div>
                         <div>
                           <p className="text-xs">Cost</p>
-                          <p className="font-medium text-foreground">Rp{purchase.cost.toFixed(2)}</p>
+                          <p className="font-medium text-foreground">${purchase.cost.toFixed(2)}</p>
                         </div>
                         <div>
                           <p className="text-xs">Status</p>
@@ -230,7 +230,7 @@ export default function PurchasesPage({
                         <div>
                           <p className="text-xs">Unit Cost</p>
                           <p className="font-medium text-foreground">
-                            Rp{(purchase.cost / purchase.quantity).toFixed(2)}
+                            ${(purchase.cost / purchase.quantity).toFixed(2)}
                           </p>
                         </div>
                       </div>

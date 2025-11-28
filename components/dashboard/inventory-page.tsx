@@ -169,7 +169,7 @@ export default function InventoryPage({
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-1">Cost per Unit (Rp) *</label>
+                  <label className="block text-sm font-medium text-foreground mb-1">Cost per Unit ($) *</label>
                   <Input
                     type="number"
                     step="0.01"
@@ -231,12 +231,12 @@ export default function InventoryPage({
                         </div>
                         <div>
                           <p className="text-xs">Unit Cost</p>
-                          <p className="font-medium text-foreground">Rp{item.cost_per_unit.toFixed(2)}</p>
+                          <p className="font-medium text-foreground">${item.cost_per_unit.toFixed(2)}</p>
                         </div>
                         <div>
                           <p className="text-xs">Total Value</p>
                           <p className="font-medium text-foreground">
-                            Rp{(item.quantity * item.cost_per_unit).toFixed(2)}
+                            ${(item.quantity * item.cost_per_unit).toFixed(2)}
                           </p>
                         </div>
                       </div>
