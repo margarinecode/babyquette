@@ -22,6 +22,7 @@ export default function Sidebar({
   const router = useRouter()
 
   const handleLogout = async () => {
+    console.log('ada')
     const supabase = createClient()
     await supabase.auth.signOut()
     router.push("/auth/login")

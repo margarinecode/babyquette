@@ -39,6 +39,12 @@ export async function getUser(token: string) {
   return response.json()
 }
 
+export async function signOut() {
+  localStorage.removeItem("supabase.auth.token")
+  localStorage.removeItem("supabase.auth.user")
+  return { success: true }
+}
+
 export async function queryTable(table: string, token: string, query = "") {
   const response = await fetch(`${SUPABASE_URL}/rest/v1/${table}${query}`, {
     headers: {
@@ -80,5 +86,6 @@ export const createClient = () => ({
       signIn(credentials.email, credentials.password),
     signUp: async (data: any) => signUp(data.email, data.password, data.options?.data?.business_name || ""),
     getUser: () => getUser(localStorage.getItem("supabase.auth.token") || ""),
+    signOut: () => signOut(),
   },
 })
