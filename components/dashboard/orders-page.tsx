@@ -158,7 +158,7 @@ export default function OrdersPage({
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-1">Total Price ($) *</label>
+                  <label className="block text-sm font-medium text-foreground mb-1">Total Price (Rp) *</label>
                   <Input
                     type="number"
                     step="0.01"
@@ -223,7 +223,7 @@ export default function OrdersPage({
                       <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mt-2 text-sm text-muted-foreground">
                         <div>
                           <p className="text-xs">Amount</p>
-                          <p className="font-medium text-foreground">${order.total_price.toFixed(2)}</p>
+                          <p className="font-medium text-foreground">Rp{order.total_price.toFixed(2)}</p>
                         </div>
                         <div>
                           <p className="text-xs">Status</p>
