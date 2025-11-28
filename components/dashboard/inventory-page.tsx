@@ -6,7 +6,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Trash2, Plus } from "lucide-react"
+import { Trash2, Plus, Edit2 } from "lucide-react"
 
 interface InventoryItem {
   id: string
@@ -27,6 +27,8 @@ export default function InventoryPage({
 }) {
   const [inventory, setInventory] = useState(initialInventory)
   const [isAdding, setIsAdding] = useState(false)
+  const [isEditing, setIsEditing] = useState(false)
+  const [editingId, setEditingId] = useState<string | null>(null)
   const [formData, setFormData] = useState({
     name: "",
     category: "Flowers",
@@ -36,12 +38,14 @@ export default function InventoryPage({
     supplier: "",
   })
 
-  const apiCall = async (method: string, table: string, data?: any) => {
+  const apiCall = async (method: string, table: string, data?: any, id?: string) => {
     const token = localStorage.getItem("supabase.auth.token")
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
     const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-    const response = await fetch(`${supabaseUrl}/rest/v1/${table}`, {
+    const url = id ? `${supabaseUrl}/rest/v1/${table}?id=eq.${id}` : `${supabaseUrl}/rest/v1/${table}`
+
+    const response = await fetch(url, {
       method,
       headers: {
         "Content-Type": "application/json",
@@ -84,6 +88,49 @@ export default function InventoryPage({
     }
   }
 
+  const handleEditClick = (item: InventoryItem) => {
+    setEditingId(item.id)
+    setFormData({
+      name: item.name,
+      category: item.category,
+      quantity: item.quantity,
+      unit: item.unit,
+      cost_per_unit: item.cost_per_unit,
+      supplier: item.supplier || "",
+    })
+    setIsEditing(true)
+  }
+
+  const handleUpdateItem = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!formData.name || formData.quantity <= 0 || formData.cost_per_unit <= 0) {
+      alert("Please fill in all required fields")
+      return
+    }
+
+    if (!editingId) return
+
+    try {
+      const result = await apiCall("PATCH", "inventory", formData, editingId)
+
+      if (result[0]) {
+        setInventory(inventory.map((item) => (item.id === editingId ? result[0] : item)))
+        setFormData({
+          name: "",
+          category: "Flowers",
+          quantity: 0,
+          unit: "stems",
+          cost_per_unit: 0,
+          supplier: "",
+        })
+        setIsEditing(false)
+        setEditingId(null)
+      }
+    } catch (error) {
+      alert("Error updating item: " + (error instanceof Error ? error.message : "Unknown error"))
+    }
+  }
+
   const handleDeleteItem = async (id: string) => {
     try {
       const token = localStorage.getItem("supabase.auth.token")
@@ -102,6 +149,19 @@ export default function InventoryPage({
     } catch (error) {
       alert("Error deleting item: " + (error instanceof Error ? error.message : "Unknown error"))
     }
+  }
+
+  const handleCancelEdit = () => {
+    setIsEditing(false)
+    setEditingId(null)
+    setFormData({
+      name: "",
+      category: "Flowers",
+      quantity: 0,
+      unit: "stems",
+      cost_per_unit: 0,
+      supplier: "",
+    })
   }
 
   return (
@@ -203,6 +263,94 @@ export default function InventoryPage({
         </Card>
       )}
 
+      {isEditing && (
+        <Card className="mb-6 border-border">
+          <CardHeader>
+            <CardTitle>Edit Inventory Item</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleUpdateItem} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1">Item Name *</label>
+                  <Input
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    placeholder="e.g., Red Roses"
+                    className="border-border"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1">Category</label>
+                  <select
+                    value={formData.category}
+                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                    className="w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground"
+                  >
+                    <option>Flowers</option>
+                    <option>Greenery</option>
+                    <option>Vases</option>
+                    <option>Supplies</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1">Quantity *</label>
+                  <Input
+                    type="number"
+                    value={formData.quantity}
+                    onChange={(e) => setFormData({ ...formData, quantity: Number(e.target.value) })}
+                    placeholder="0"
+                    className="border-border"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1">Unit</label>
+                  <Input
+                    value={formData.unit}
+                    onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
+                    placeholder="stems, bunch, box"
+                    className="border-border"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1">Cost per Unit (Rp) *</label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    value={formData.cost_per_unit}
+                    onChange={(e) => setFormData({ ...formData, cost_per_unit: Number(e.target.value) })}
+                    placeholder="0.00"
+                    className="border-border"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1">Supplier</label>
+                  <Input
+                    value={formData.supplier}
+                    onChange={(e) => setFormData({ ...formData, supplier: e.target.value })}
+                    placeholder="Supplier name"
+                    className="border-border"
+                  />
+                </div>
+              </div>
+              <div className="flex gap-2 justify-end">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleCancelEdit}
+                  className="border-border bg-transparent"
+                >
+                  Cancel
+                </Button>
+                <Button type="submit" className="bg-primary text-primary-foreground hover:bg-primary/90">
+                  Update Item
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Inventory Table */}
       <div className="space-y-4">
         {inventory.length === 0 ? (
@@ -243,14 +391,24 @@ export default function InventoryPage({
                       </div>
                       {item.supplier && <p className="text-sm text-muted-foreground mt-2">Supplier: {item.supplier}</p>}
                     </div>
-                    <Button
-                      onClick={() => handleDeleteItem(item.id)}
-                      variant="ghost"
-                      size="sm"
-                      className="text-destructive hover:bg-destructive/10"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
+                    <div className="flex gap-2 ml-4">
+                      <Button
+                        onClick={() => handleEditClick(item)}
+                        variant="ghost"
+                        size="sm"
+                        className="text-primary hover:bg-primary/10"
+                      >
+                        <Edit2 className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        onClick={() => handleDeleteItem(item.id)}
+                        variant="ghost"
+                        size="sm"
+                        className="text-destructive hover:bg-destructive/10"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
