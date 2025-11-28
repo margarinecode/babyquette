@@ -10,6 +10,9 @@ interface Profile {
 interface InventoryItem {
   quantity: number
   cost_per_unit: number
+  id: string
+  name: string
+  unit: string
 }
 
 interface Purchase {
@@ -19,6 +22,7 @@ interface Purchase {
 interface Order {
   total_price: number
   status: string
+  id: string
 }
 
 export default function DashboardHome({
@@ -40,19 +44,19 @@ export default function DashboardHome({
   const stats = [
     {
       title: "Total Inventory Value",
-      value: `$${totalInventoryValue.toFixed(2)}`,
+      value: `Rp${totalInventoryValue.toFixed(2)}`,
       icon: Package,
       color: "text-blue-600",
     },
     {
       title: "Total Purchases",
-      value: `$${totalPurchaseCost.toFixed(2)}`,
+      value: `Rp${totalPurchaseCost.toFixed(2)}`,
       icon: ShoppingCart,
       color: "text-green-600",
     },
     {
       title: "Order Revenue",
-      value: `$${totalOrderRevenue.toFixed(2)}`,
+      value: `Rp${totalOrderRevenue.toFixed(2)}`,
       icon: TrendingUp,
       color: "text-purple-600",
     },
@@ -109,7 +113,7 @@ export default function DashboardHome({
                 >
                   <div className="flex-1">
                     <p className="text-sm font-medium text-foreground">{order.id.substring(0, 8)}...</p>
-                    <p className="text-xs text-muted-foreground">${order.total_price.toFixed(2)}</p>
+                    <p className="text-xs text-muted-foreground">Rp{order.total_price.toFixed(2)}</p>
                   </div>
                   <span
                     className={`px-2.5 py-1 rounded-full text-xs font-medium ${
@@ -148,7 +152,7 @@ export default function DashboardHome({
                     </p>
                   </div>
                   <span className="text-sm font-semibold text-foreground">
-                    ${(item.quantity * item.cost_per_unit).toFixed(2)}
+                    Rp{(item.quantity * item.cost_per_unit).toFixed(2)}
                   </span>
                 </div>
               ))}
