@@ -67,6 +67,32 @@ export default function PurchasesPage({
     return response.json()
   }
 
+  const updateInventoryQuantity = async (inventoryId: string, quantityToAdd: number) => {
+    try {
+      const token = localStorage.getItem("supabase.auth.token")
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+      const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+      const currentItem = inventory.find((item) => item.id === inventoryId)
+      if (!currentItem) return
+
+      const newQuantity = currentItem.quantity + quantityToAdd
+
+      await fetch(`${supabaseUrl}/rest/v1/inventory?id=eq.${inventoryId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+          apikey: supabaseKey,
+          Prefer: "return=representation",
+        },
+        body: JSON.stringify({ quantity: newQuantity }),
+      })
+    } catch (error) {
+      console.error("Error updating inventory quantity:", error)
+    }
+  }
+
   const getInventoryName = (inventoryId?: string) => {
     if (!inventoryId) return "N/A"
     const item = inventory.find((inv) => inv.id === inventoryId)
@@ -93,6 +119,10 @@ export default function PurchasesPage({
       })
 
       if (result[0]) {
+        if (formData.inventory_id) {
+          await updateInventoryQuantity(formData.inventory_id, formData.quantity)
+        }
+
         setPurchases([...purchases, result[0]])
         setFormData({
           inventory_id: "",
