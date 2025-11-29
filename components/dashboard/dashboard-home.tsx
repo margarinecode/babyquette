@@ -62,7 +62,7 @@ export default function DashboardHome({
     },
     {
       title: "Saldo",
-      value: saldo.toString(),
+      value: `Rp${saldo.toLocaleString('id-ID')}`,
       icon: FileText,
       color: "text-orange-600",
     },
