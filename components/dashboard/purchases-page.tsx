@@ -11,6 +11,7 @@ import { Trash2, Plus } from "lucide-react"
 interface Purchase {
   id: string
   supplier_name: string
+  inventory_id?: string
   quantity: number
   cost: number
   purchase_date: string
@@ -18,16 +19,29 @@ interface Purchase {
   notes?: string
 }
 
+interface InventoryItem {
+  id: string
+  name: string
+  category: string
+  quantity: number
+  unit: string
+  cost_per_unit: number
+  supplier?: string
+}
+
 export default function PurchasesPage({
   purchases: initialPurchases,
+  inventory,
   userId,
 }: {
   purchases: Purchase[]
+  inventory: InventoryItem[]
   userId: string
 }) {
   const [purchases, setPurchases] = useState(initialPurchases)
   const [isAdding, setIsAdding] = useState(false)
   const [formData, setFormData] = useState({
+    inventory_id: "",
     supplier_name: "",
     quantity: 0,
     cost: 0,
@@ -53,6 +67,12 @@ export default function PurchasesPage({
     return response.json()
   }
 
+  const getInventoryName = (inventoryId?: string) => {
+    if (!inventoryId) return "N/A"
+    const item = inventory.find((inv) => inv.id === inventoryId)
+    return item ? item.name : "N/A"
+  }
+
   const handleAddPurchase = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!formData.supplier_name || formData.quantity <= 0 || formData.cost <= 0) {
@@ -63,13 +83,19 @@ export default function PurchasesPage({
     try {
       const result = await apiCall("POST", "purchases", {
         user_id: userId,
-        ...formData,
+        inventory_id: formData.inventory_id || null,
+        supplier_name: formData.supplier_name,
+        quantity: formData.quantity,
+        cost: formData.cost,
+        status: formData.status,
+        notes: formData.notes,
         purchase_date: new Date().toISOString(),
       })
 
       if (result[0]) {
         setPurchases([...purchases, result[0]])
         setFormData({
+          inventory_id: "",
           supplier_name: "",
           quantity: 0,
           cost: 0,
@@ -127,6 +153,21 @@ export default function PurchasesPage({
           <CardContent>
             <form onSubmit={handleAddPurchase} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1">Inventory Item</label>
+                  <select
+                    value={formData.inventory_id}
+                    onChange={(e) => setFormData({ ...formData, inventory_id: e.target.value })}
+                    className="w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground"
+                  >
+                    <option value="">Select an inventory item (optional)</option>
+                    {inventory.map((item) => (
+                      <option key={item.id} value={item.id}>
+                        {item.name} ({item.category})
+                      </option>
+                    ))}
+                  </select>
+                </div>
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-1">Supplier Name *</label>
                   <Input
@@ -209,7 +250,11 @@ export default function PurchasesPage({
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
                       <h3 className="font-semibold text-foreground">{purchase.supplier_name}</h3>
-                      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mt-2 text-sm text-muted-foreground">
+                      <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mt-2 text-sm text-muted-foreground">
+                        <div>
+                          <p className="text-xs">Inventory Item</p>
+                          <p className="font-medium text-foreground">{getInventoryName(purchase.inventory_id)}</p>
+                        </div>
                         <div>
                           <p className="text-xs">Quantity</p>
                           <p className="font-medium text-foreground">{purchase.quantity}</p>
