@@ -50,13 +50,13 @@ export default function DashboardHome({
     },
     {
       title: "Total Purchases",
-      value: `Rp${totalPurchaseCost.toFixed(2)}`,
+      value: `Rp${totalPurchaseCost.toLocaleString('id-ID')}`,
       icon: ShoppingCart,
       color: "text-green-600",
     },
     {
       title: "Order Revenue",
-      value: `Rp${totalOrderRevenue.toFixed(2)}`,
+      value: `Rp${totalOrderRevenue.toLocaleString('id-ID')}`,
       icon: TrendingUp,
       color: "text-purple-600",
     },
