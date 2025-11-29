@@ -38,7 +38,7 @@ export default function DashboardHome({
 }) {
   const totalInventoryValue = inventory.reduce((sum, item) => sum + item.quantity * item.cost_per_unit, 0)
   const totalPurchaseCost = purchases.reduce((sum, p) => sum + p.cost, 0)
-  const totalOrderRevenue = orders.reduce((sum, o) => sum + o.total_price, 0)
+  const totalOrderRevenue = orders.filter((val)=>val.status == 'completed').reduce((sum, o) => sum + o.total_price, 0)
   const saldo = totalOrderRevenue - totalPurchaseCost;
 
   const stats = [
