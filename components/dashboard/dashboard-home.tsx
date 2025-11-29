@@ -38,31 +38,31 @@ export default function DashboardHome({
 }) {
   const totalInventoryValue = inventory.reduce((sum, item) => sum + item.quantity * item.cost_per_unit, 0)
   const totalPurchaseCost = purchases.reduce((sum, p) => sum + p.cost, 0)
-  const totalOrderRevenue = orders.reduce((sum, o) => sum + o.total_price, 0)
-  const pendingOrders = orders.filter((o) => o.status === "pending").length
+  const totalOrderRevenue = orders.filter((val)=>val.status == 'completed').reduce((sum, o) => sum + o.total_price, 0)
+  const saldo = totalOrderRevenue - totalPurchaseCost;
 
   const stats = [
     {
       title: "Total Inventory Value",
-      value: `Rp${totalInventoryValue.toFixed(2)}`,
+      value: `Rp${totalInventoryValue.toLocaleString('id-ID')}`,
       icon: Package,
       color: "text-blue-600",
     },
     {
       title: "Total Purchases",
-      value: `Rp${totalPurchaseCost.toFixed(2)}`,
+      value: `Rp${totalPurchaseCost.toLocaleString('id-ID')}`,
       icon: ShoppingCart,
       color: "text-green-600",
     },
     {
       title: "Order Revenue",
-      value: `Rp${totalOrderRevenue.toFixed(2)}`,
+      value: `Rp${totalOrderRevenue.toLocaleString('id-ID')}`,
       icon: TrendingUp,
       color: "text-purple-600",
     },
     {
-      title: "Pending Orders",
-      value: pendingOrders.toString(),
+      title: "Saldo",
+      value: `Rp${saldo.toLocaleString('id-ID')}`,
       icon: FileText,
       color: "text-orange-600",
     },

@@ -65,7 +65,7 @@ export default function DashboardClient({
           <DashboardHome profile={profile} inventory={inventory} purchases={purchases} orders={orders} />
         )}
         {currentPage === "inventory" && <InventoryPage inventory={inventory} userId={user.id} />}
-        {currentPage === "purchases" && <PurchasesPage purchases={purchases} userId={user.id} />}
+        {currentPage === "purchases" && <PurchasesPage purchases={purchases} inventory={inventory} userId={user.id} />}
         {currentPage === "orders" && <OrdersPage orders={orders} userId={user.id} />}
       </main>
     </div>
