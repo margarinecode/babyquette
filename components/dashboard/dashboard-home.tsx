@@ -44,7 +44,7 @@ export default function DashboardHome({
   const stats = [
     {
       title: "Total Inventory Value",
-      value: `Rp${totalInventoryValue.toFixed(2).toLocaleeString('id-ID')}`,
+      value: `Rp${totalInventoryValue.toFixed(2).toLocaleString('id-ID')}`,
       icon: Package,
       color: "text-blue-600",
     },
